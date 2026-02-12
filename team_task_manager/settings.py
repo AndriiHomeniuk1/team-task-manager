@@ -116,3 +116,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+
+# Authentication
+# https://docs.djangoproject.com/en/5.1/topics/auth/customizing/
+
+AUTH_USER_MODEL = "tasks.Worker"
