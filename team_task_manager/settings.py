@@ -118,6 +118,10 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 
+# Media files
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 # Authentication
 # https://docs.djangoproject.com/en/5.1/topics/auth/customizing/
 
