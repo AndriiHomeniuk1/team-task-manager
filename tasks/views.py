@@ -8,16 +8,16 @@ from tasks.models import Position, TaskType, Worker, Task
 def index(request: HttpRequest) -> HttpResponse:
     return render(request, "tasks/index.html")
 
-class PositionView(generic.ListView):
+class PositionListView(generic.ListView):
     model = Position
 
-class TaskTypeView(generic.ListView):
+class TaskTypeListView(generic.ListView):
     model = TaskType
     template_name = "tasks/task_type_list.html"
     context_object_name = "task_type_list"
 
-class WorkerView(generic.ListView):
+class WorkerListView(generic.ListView):
     model = Worker
 
-class TaskView(generic.ListView):
+class TaskListView(generic.ListView):
     model = Task
