@@ -1,0 +1,83 @@
+{% load query_transform %}
+
+{% if is_paginated %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination pagination-primary justify-content-center mb-0">
+      <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+        {% if page_obj.has_previous %}
+          <a class="page-link" href="?{% query_transform request page=page_obj.previous_page_number %}">
+            <i class="ni ni-bold-left"></i>
+          </a>
+        {% else %}
+          <span class="page-link"><i class="ni ni-bold-left"></i></span>
+        {% endif %}
+      </li>
+
+      {% if page_obj.paginator.num_pages <= 9 %}
+        {% for num in page_obj.paginator.page_range %}
+          <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link" href="?{% query_transform request page=num %}">{{ num }}</a>
+          </li>
+        {% endfor %}
+      {% else %}
+        {% if page_obj.number <= 5 %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if num <= 9 %}
+              <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?{% query_transform request page=num %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+          <li class="page-item">
+            <a class="page-link" href="?{% query_transform request page=page_obj.paginator.num_pages %}">
+              {{ page_obj.paginator.num_pages }}
+            </a>
+          </li>
+
+        {% elif page_obj.number >= page_obj.paginator.num_pages|add:-4 %}
+          <li class="page-item">
+            <a class="page-link" href="?{% query_transform request page=1 %}">1</a>
+          </li>
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% for num in page_obj.paginator.page_range %}
+            {% if num > page_obj.paginator.num_pages|add:-9 %}
+              <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?{% query_transform request page=num %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+        {% else %}
+          <li class="page-item">
+            <a class="page-link" href="?{% query_transform request page=1 %}">1</a>
+          </li>
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% for num in page_obj.paginator.page_range %}
+            {% if num >= page_obj.number|add:-3 and num <= page_obj.number|add:3 %}
+              <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?{% query_transform request page=num %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+          <li class="page-item">
+            <a class="page-link" href="?{% query_transform request page=page_obj.paginator.num_pages %}">
+              {{ page_obj.paginator.num_pages }}
+            </a>
+          </li>
+        {% endif %}
+      {% endif %}
+
+      <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+        {% if page_obj.has_next %}
+          <a class="page-link" href="?{% query_transform request page=page_obj.next_page_number %}">
+            <i class="ni ni-bold-right"></i>
+          </a>
+        {% else %}
+          <span class="page-link"><i class="ni ni-bold-right"></i></span>
+        {% endif %}
+      </li>
+    </ul>
+  </nav>
+{% endif %}
