@@ -1,0 +1,512 @@
+{% load static %}
+
+
+<!--   Core JS Files   -->
+<script src="{% static 'assets/js/core/popper.min.js' %}"></script>
+<script src="{% static 'assets/js/core/bootstrap.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/perfect-scrollbar.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/smooth-scrollbar.min.js' %}"></script>
+
+<script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+        damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+</script>
+<!-- Github buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+<script src="{% static 'assets/js/soft-ui-dashboard.min.js' %}?v=1.1.0"></script>
+
+
+<!-- CALENDAR Flatpickr -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  flatpickr("#deadlinePicker", {
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    altInput: true,
+    altFormat: "F j, Y",   // (March 4, 2026)
+    allowInput: true,
+  });
+</script>
+
+
+<!-- Avatar -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const input = document.getElementById("id_avatar");
+  const preview = document.getElementById("avatarPreview");
+  if (input && preview) {
+    input.addEventListener("change", function(event) {
+      const [file] = event.target.files;
+      if (file) {
+        preview.src = URL.createObjectURL(file);
+      }
+    });
+  }
+});
+</script>
+
+
+<!-- Sidebar Colors -->
+<script>
+  function sidebarColor(element) {
+    const color = element.getAttribute("data-color");
+
+    const links = document.querySelectorAll(".nav-link");
+
+    links.forEach(link => {
+      if (link.classList.contains("active")) {
+        link.classList.remove(
+          "bg-gradient-primary",
+          "bg-gradient-dark",
+          "bg-gradient-info",
+          "bg-gradient-success",
+          "bg-gradient-warning",
+          "bg-gradient-danger"
+        );
+
+        link.classList.add("bg-gradient-" + color);
+      }
+    });
+
+    document.querySelectorAll(".badge.filter").forEach(el => {
+      el.classList.remove("active");
+    });
+    element.classList.add("active");
+
+    localStorage.setItem("activeItemColor", color);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const savedColor = localStorage.getItem("activeItemColor");
+
+    if (savedColor) {
+      const activeLink = document.querySelector(".nav-link.active");
+
+      if (activeLink) {
+        activeLink.classList.add("bg-gradient-" + savedColor);
+      }
+
+      document.querySelectorAll(".badge.filter").forEach(el => {
+        if (el.getAttribute("data-color") === savedColor) {
+          el.classList.add("active");
+        }
+      });
+    }
+  });
+</script>
+
+
+<!-- Dashboard-card Backgrounds  -->
+<script>
+  function setDashboardBg(element) {
+    const bg = element.getAttribute("data-bg");
+    const card = document.getElementById("dashboard-card");
+
+    if (!card) return;
+
+    card.style.backgroundImage = `url('/static/assets/img/curved-images/${bg}')`;
+
+    document.querySelectorAll(".bg-thumb").forEach(el => {
+      el.classList.remove("active");
+    });
+    element.classList.add("active");
+
+    localStorage.setItem("dashboardBg", bg);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const savedBg = localStorage.getItem("dashboardBg");
+    const card = document.getElementById("dashboard-card");
+
+    if (savedBg && card) {
+      card.style.backgroundImage = `url('/static/assets/img/curved-images/${savedBg}')`;
+
+      document.querySelectorAll(".bg-thumb").forEach(el => {
+        if (el.getAttribute("data-bg") === savedBg) {
+          el.classList.add("active");
+        }
+      });
+    }
+  });
+</script>
+
+
+<!-- PAGE SIZE -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const pageSizeSelect = document.getElementById("pageSizeSelect");
+
+  if (!pageSizeSelect) return;
+
+  pageSizeSelect.addEventListener("change", function () {
+    const params = new URLSearchParams(window.location.search);
+    params.set("page_size", this.value);
+    params.set("page", 1);
+    window.location.search = params.toString();
+  });
+});
+</script>
+
+
+<!-- HIDE/SHOW COLUMN -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const STORAGE_KEY = "table_columns_visibility";
+
+  const checkboxes = document.querySelectorAll('#dropdownDefaultCheckbox input[type="checkbox"]');
+
+  let savedState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+  checkboxes.forEach(function (checkbox) {
+    const targetColumnId = checkbox.getAttribute('data-bs-target');
+    const targetElements = document.querySelectorAll('.' + targetColumnId);
+
+    if (savedState.hasOwnProperty(targetColumnId)) {
+      checkbox.checked = savedState[targetColumnId];
+    }
+
+    targetElements.forEach(function (el) {
+      el.style.display = checkbox.checked ? '' : 'none';
+    });
+
+    checkbox.addEventListener('change', function () {
+      const isChecked = this.checked;
+
+      targetElements.forEach(function (el) {
+        el.style.display = isChecked ? '' : 'none';
+      });
+
+      savedState[targetColumnId] = isChecked;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedState));
+    });
+  });
+});
+</script>
+
+
+<!-- Task Filters -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const addButton = document.getElementById("addButton");
+  const inputContainer = document.getElementById("inputContainer");
+  const submitButton = document.getElementById("submitButton");
+  const params = new URLSearchParams(window.location.search);
+
+  const hasFilters =
+    params.getAll("key").length > 0 ||
+    params.has("deadline_from") ||
+    params.has("deadline_to");
+
+  function createFilterRow(selectedKey = null, selectedValue = null, extra = {}) {
+    const div = document.createElement("div");
+    div.classList.add("d-flex", "gap-3", "mb-1", "input-container");
+
+    div.innerHTML = `
+      <div class="d-flex gap-3">
+        <select name="key" class="form-select rounded filter-key height">
+          <option value="priority">Priority</option>
+          <option value="is_completed">Is Completed</option>
+          <option value="task_type">Task Type</option>
+          <option value="deadline">Deadline</option>
+        </select>
+        <div class="filter-value"></div>
+      </div>
+      ${!hasFilters ? '<button type="button" class="remove-button btn btn-danger">X</button>' : ''}
+    `;
+
+    inputContainer.appendChild(div);
+
+    const keySelect = div.querySelector(".filter-key");
+    const valueContainer = div.querySelector(".filter-value");
+
+    if (selectedKey) {
+      keySelect.value = selectedKey;
+    }
+
+    function updateValueField() {
+      const selectedKey = keySelect.value;
+
+      if (selectedKey === "priority") {
+        valueContainer.innerHTML = `
+          <select name="value" class="form-select rounded height">
+            {% for val,label in priorities %}
+              <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        `;
+      }
+      else if (selectedKey === "is_completed") {
+        valueContainer.innerHTML = `
+          <select name="value" class="form-select rounded height">
+            {% for val,label in completed_choices %}
+              <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        `;
+      }
+      else if (selectedKey === "task_type") {
+        valueContainer.innerHTML = `
+          <select name="value" class="form-select rounded height">
+            {% for t in task_types %}
+              <option value="{{ t.name }}">{{ t.name }}</option>
+            {% endfor %}
+          </select>
+        `;
+      }
+      else if (selectedKey === "deadline") {
+        const uniqueIdFrom = "deadlineFrom_" + Date.now();
+        const uniqueIdTo = "deadlineTo_" + Date.now();
+
+        valueContainer.innerHTML = `
+          <div class="row g-2">
+            <div class="col">
+              <input type="text" name="deadline_from" id="${uniqueIdFrom}"
+                     class="form-control rounded height"
+                     placeholder="From date">
+            </div>
+            <div class="col">
+              <input type="text" name="deadline_to" id="${uniqueIdTo}"
+                     class="form-control rounded height"
+                     placeholder="To date">
+            </div>
+          </div>
+        `;
+
+        flatpickr("#" + uniqueIdFrom, {
+          dateFormat: "Y-m-d",
+          defaultDate: extra.from || null
+        });
+
+        flatpickr("#" + uniqueIdTo, {
+          dateFormat: "Y-m-d",
+          defaultDate: extra.to || null
+        });
+      }
+
+      if (selectedValue && selectedKey !== "deadline") {
+        const select = valueContainer.querySelector("select");
+        if (select) select.value = selectedValue;
+      }
+
+      if (hasFilters) {
+        div.querySelectorAll("select, input").forEach(el => {
+          el.disabled = true;
+        });
+      }
+    }
+
+    keySelect.addEventListener("change", updateValueField);
+    updateValueField();
+
+    const removeBtn = div.querySelector(".remove-button");
+    if (removeBtn) {
+      removeBtn.addEventListener("click", function () {
+        div.remove();
+        if (inputContainer.children.length === 0) {
+          submitButton.style.display = "none";
+        }
+      });
+    }
+
+    submitButton.style.display = "inline-block";
+  }
+
+  addButton.addEventListener("click", () => createFilterRow());
+
+  const keys = params.getAll("key");
+  const values = params.getAll("value");
+
+  if (hasFilters) {
+    keys.forEach((key, index) => {
+      if (key === "deadline") {
+        createFilterRow(key, null, {
+          from: params.get("deadline_from"),
+          to: params.get("deadline_to")
+        });
+      } else {
+        createFilterRow(key, values[index]);
+      }
+    });
+
+    submitButton.innerText = "Cancel Changes";
+    submitButton.classList.remove("btn-success");
+    submitButton.classList.add("btn-secondary");
+
+    submitButton.addEventListener("click", function (e) {
+      e.preventDefault();
+      window.location.href = window.location.pathname;
+    });
+  }
+
+});
+</script>
+
+
+<!-- Worker Filters -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const addButton = document.getElementById("workerAddButton");
+  const inputContainer = document.getElementById("workerInputContainer");
+  const submitButton = document.getElementById("workerSubmitButton");
+  const params = new URLSearchParams(window.location.search);
+
+  const hasFilters = params.getAll("position").length > 0;
+
+  function createFilterRow(selectedValue = null) {
+    const div = document.createElement("div");
+    div.classList.add("d-flex", "gap-3", "mb-1", "input-container");
+
+    div.innerHTML = `
+      <div class="d-flex gap-3">
+        <select name="key" class="form-select rounded filter-key height">
+          <option value="position">Position</option>
+        </select>
+        <div class="filter-value"></div>
+      </div>
+      ${!hasFilters ? '<button type="button" class="remove-button btn btn-danger">X</button>' : ''}
+    `;
+
+    inputContainer.appendChild(div);
+
+    const keySelect = div.querySelector(".filter-key");
+    const valueContainer = div.querySelector(".filter-value");
+
+    function updateValueField() {
+      const selectedKey = keySelect.value;
+
+      if (selectedKey === "position") {
+        valueContainer.innerHTML = `
+          <select name="position" class="form-select rounded height">
+            {% for pos in positions %}
+              <option value="{{ pos.name }}">{{ pos.name }}</option>
+            {% endfor %}
+          </select>
+        `;
+      }
+
+      if (selectedValue) {
+        const select = valueContainer.querySelector("select");
+        if (select) select.value = selectedValue;
+      }
+
+      if (hasFilters) {
+        div.querySelectorAll("select").forEach(el => {
+          el.disabled = true;
+        });
+      }
+    }
+
+    keySelect.addEventListener("change", updateValueField);
+    updateValueField();
+
+    const removeBtn = div.querySelector(".remove-button");
+    if (removeBtn) {
+      removeBtn.addEventListener("click", function () {
+        div.remove();
+        if (inputContainer.children.length === 0) {
+          submitButton.style.display = "none";
+        }
+      });
+    }
+
+    submitButton.style.display = "inline-block";
+  }
+
+  addButton.addEventListener("click", () => createFilterRow());
+
+  const positions = params.getAll("position");
+
+  if (hasFilters) {
+    positions.forEach(val => {
+      createFilterRow(val);
+    });
+
+    submitButton.innerText = "Cancel Changes";
+    submitButton.classList.remove("btn-success");
+    submitButton.classList.add("btn-secondary");
+
+    submitButton.addEventListener("click", function (e) {
+      e.preventDefault();
+      window.location.href = window.location.pathname;
+    });
+  }
+});
+</script>
+
+
+<!--navbarFixed-->
+
+<script>
+  (function () {
+    const NAVBAR_FIXED_KEY = 'navbarFixedEnabled';
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const checkbox = document.getElementById('navbarFixed');
+      if (!checkbox) return;
+
+      const saved = localStorage.getItem(NAVBAR_FIXED_KEY);
+      if (saved === 'true') {
+        checkbox.checked = true;
+        navbarFixed(checkbox);
+      }
+
+      checkbox.addEventListener('change', function () {
+        localStorage.setItem(NAVBAR_FIXED_KEY, this.checked ? 'true' : 'false');
+      });
+    });
+  })();
+</script>
+
+
+<!--Persist collapse/expand state of cards-->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const STORAGE_KEY = "collapseState";
+  const cards = document.querySelectorAll("[data-collapse-id]");
+
+  cards.forEach(card => {
+    const id = card.getAttribute("data-collapse-id");
+    const body = card.querySelector(".collapse-body");
+    const btn = card.querySelector(".collapse-toggle");
+    const icon = btn.querySelector("i");
+
+    if (!body || !btn) return;
+
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+    if (saved[id] === false) {
+      body.style.display = "none";
+      icon.classList.remove("fa-chevron-up");
+      icon.classList.add("fa-chevron-down");
+    }
+
+    btn.addEventListener("click", function () {
+
+      const isHidden = body.style.display === "none";
+
+      if (isHidden) {
+        body.style.display = "";
+        icon.classList.remove("fa-chevron-down");
+        icon.classList.add("fa-chevron-up");
+        saved[id] = true;
+      } else {
+        body.style.display = "none";
+        icon.classList.remove("fa-chevron-up");
+        icon.classList.add("fa-chevron-down");
+        saved[id] = false;
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+    });
+  });
+});
+</script>
