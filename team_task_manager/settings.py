@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "tasks",
     "accounts",
+    "widget_tweaks",
     "django_cleanup.apps.CleanupConfig",
 ]
 
