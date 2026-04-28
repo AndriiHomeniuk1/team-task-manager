@@ -1,3 +1,5 @@
+from typing import Any, Optional
+from django.db.models import QuerySet
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
@@ -6,6 +8,18 @@ from django.views import generic
 
 from tasks.models import Position, TaskType, Worker, Task
 
+
+class PageSizeMixin:
+    request: HttpRequest
+
+    def get_paginate_by(self, queryset: QuerySet[Any]) -> Optional[int]:
+        page_size = self.request.GET.get("page_size")
+        if page_size:
+            try:
+                return int(page_size)
+            except ValueError:
+                pass
+        return getattr(self, "paginate_by", 5)
 
 @login_required
 def index(request: HttpRequest) -> HttpResponse:
