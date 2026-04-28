@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import (
 )
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views import generic
@@ -15,6 +15,7 @@ from django.views import generic
 from tasks.models import Position, TaskType, Worker, Task
 from .utils import (
     get_position_messages,
+    get_tasktype_messages,
     apply_search,
 )
 
@@ -144,7 +145,69 @@ class PositionDeleteView(
 class TaskTypeListView(generic.ListView):
     model = TaskType
     template_name = "tasks/task_type_list.html"
-    context_object_name = "task_type_list"
+    context_object_name = "task_types"
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = apply_search(queryset, self.request.GET, ["name"])
+        return queryset
+
+class TaskTypeCreateView(
+    LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
+):
+    model = TaskType
+    fields = ["name"]
+    template_name = "tasks/task_type_form.html"
+    success_url = reverse_lazy("tasks:task-type-list")
+    permission_required = "tasks.add_tasktype"
+
+
+class TaskTypeUpdateView(
+    LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView
+):
+    model = TaskType
+    fields = ["name"]
+    template_name = "tasks/task_type_form.html"
+    success_url = reverse_lazy("tasks:task-type-list")
+    permission_required = "tasks.change_tasktype"
+
+
+
+class TaskTypeDeleteView(
+    LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
+):
+    model = TaskType
+    template_name = "tasks/confirm_delete.html"
+    success_url = reverse_lazy("tasks:task-type-list")
+    permission_required = "tasks.delete_tasktype"
+    MAX_DISPLAY = 5
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.tasks.exists():
+            return redirect("tasks:task-type-delete", pk=self.object.pk)
+        return super().post(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tasks = self.object.tasks.all()
+        total_count = tasks.count()
+        extra_tasks_count = tasks.count() - self.MAX_DISPLAY
+
+        context.update(
+            {
+                "delete_type": "tasktype",
+                "success_url": self.success_url,
+                "tasks_display": tasks[: self.MAX_DISPLAY],
+                "extra_tasks_count": extra_tasks_count,
+            }
+        )
+        context.update(
+            get_tasktype_messages(self.object, total_count, extra_tasks_count)
+        )
+
+        return context
 
 
 class WorkerListView(generic.ListView):
