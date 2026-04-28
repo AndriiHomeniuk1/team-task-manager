@@ -142,7 +142,7 @@ class PositionDeleteView(
         return context
 
 
-class TaskTypeListView(generic.ListView):
+class TaskTypeListView(LoginRequiredMixin, PageSizeMixin, generic.ListView):
     model = TaskType
     template_name = "tasks/task_type_list.html"
     context_object_name = "task_types"
