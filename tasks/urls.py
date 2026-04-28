@@ -4,6 +4,9 @@ from tasks.views import (
     index,
     profile,
     PositionListView,
+    PositionCreateView,
+    PositionUpdateView,
+    PositionDeleteView,
     TaskTypeListView,
     WorkerListView,
     TaskListView,
@@ -16,6 +19,21 @@ urlpatterns = [
     path("", index, name="index"),
     path("profile/", profile, name="profile"),
     path("positions/", PositionListView.as_view(), name="position-list"),
+    path(
+        "positions/create/",
+        PositionCreateView.as_view(),
+        name="position-create"
+    ),
+    path(
+        "positions/<int:pk>/update/",
+        PositionUpdateView.as_view(),
+        name="position-update",
+    ),
+    path(
+        "positions/<int:pk>/delete/",
+        PositionDeleteView.as_view(),
+        name="position-delete",
+    ),
     path("task-types/", TaskTypeListView.as_view(), name="task-type-list"),
     path("workers/", WorkerListView.as_view(), name="worker-list"),
     path("tasks/", TaskListView.as_view(), name="task-list"),
