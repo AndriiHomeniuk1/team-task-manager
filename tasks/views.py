@@ -39,6 +39,14 @@ def index(request: HttpRequest) -> HttpResponse:
 
     return render(request, "tasks/index.html", context)
 
+@login_required
+def profile(request):
+    return render(
+        request,
+        "tasks/profile.html",
+        {"worker": request.user}
+    )
+
 class PositionListView(generic.ListView):
     model = Position
 
