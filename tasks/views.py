@@ -158,6 +158,7 @@ class TaskTypeListView(LoginRequiredMixin, PageSizeMixin, generic.ListView):
         queryset = apply_search(queryset, self.request.GET, ["name"])
         return queryset
 
+
 class TaskTypeCreateView(
     LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView
 ):
@@ -401,3 +402,30 @@ class TaskDeleteView(
     def get_success_url(self):
         return self.request.GET.get(
             "next", str(reverse_lazy("tasks:task-list")))
+
+
+class UserTaskListView(LoginRequiredMixin, PageSizeMixin, generic.ListView):
+    model = Task
+    context_object_name = "tasks"
+    paginate_by = 5
+    template_name = "tasks/task_list.html"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(assignees=self.request.user)
+        queryset = apply_search(
+            queryset, self.request.GET, ["name", "pk"])
+        queryset = filter_tasks(queryset, self.request.GET)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "priorities": Task._meta.get_field("priority").choices,
+                "completed_choices": [("true", "True"), ("false", "False")],
+                "task_types": TaskType.objects.all(),
+                "next_url": reverse("tasks:user-task-list"),
+            }
+        )
+        return context

@@ -20,6 +20,7 @@ from tasks.views import (
     TaskCreateView,
     TaskUpdateView,
     TaskDeleteView,
+    UserTaskListView,
 )
 
 
@@ -104,5 +105,5 @@ urlpatterns = [
         TaskDeleteView.as_view(),
         name="task-delete"
     ),
-
+    path("tasks/my/", UserTaskListView.as_view(), name="user-task-list"),
 ]
