@@ -3,9 +3,11 @@ from typing import Any, Optional
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
+    UserPassesTestMixin,
     PermissionRequiredMixin,
 )
-from django.db.models import QuerySet
+from django.db.models import Value, QuerySet
+from django.db.models.functions import Concat
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -13,6 +15,7 @@ from django.utils import timezone
 from django.views import generic
 
 from tasks.models import Position, TaskType, Worker, Task
+from .forms import WorkerUpdateForm
 from .utils import (
     get_position_messages,
     get_tasktype_messages,
@@ -173,7 +176,6 @@ class TaskTypeUpdateView(
     permission_required = "tasks.change_tasktype"
 
 
-
 class TaskTypeDeleteView(
     LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView
 ):
@@ -210,8 +212,75 @@ class TaskTypeDeleteView(
         return context
 
 
-class WorkerListView(generic.ListView):
+class WorkerListView(LoginRequiredMixin, PageSizeMixin, generic.ListView):
     model = Worker
+    context_object_name = "workers"
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(is_active=True)
+        queryset = queryset.annotate(
+            full_name=Concat("first_name", Value(" "), "last_name")
+        )
+        queryset = apply_search(
+            queryset,
+            self.request.GET,
+            ["username", "first_name", "last_name", "full_name"],
+        )
+
+        positions = self.request.GET.getlist("position")
+        if positions:
+            queryset = queryset.filter(position__name__in=positions)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["positions"] = Position.objects.all()
+        return context
+
+
+class WorkerDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Worker
+    template_name = "tasks/profile.html"
+    context_object_name = "worker"
+
+
+class WorkerUpdateView(
+    LoginRequiredMixin,
+    UserPassesTestMixin,
+    generic.UpdateView
+):
+    model = Worker
+    form_class = WorkerUpdateForm
+    template_name = "tasks/worker_form.html"
+    context_object_name = "worker"
+    success_url = reverse_lazy("tasks:worker-list")
+
+    def test_func(self):
+        worker = self.get_object()
+        return worker == self.request.user
+
+
+class WorkerSelfDeactivateView(
+    LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView
+):
+    model = Worker
+    template_name = "tasks/worker_confirm_deactivate.html"
+    context_object_name = "worker"
+    fields = []
+    success_url = reverse_lazy("accounts:login")
+
+    def test_func(self):
+        worker = self.get_object()
+        return worker == self.request.user
+
+    def form_valid(self, form):
+        worker = form.instance
+        worker.is_active = False
+        worker.save(update_fields=["is_active"])
+        return super().form_valid(form)
 
 
 class TaskListView(generic.ListView):
