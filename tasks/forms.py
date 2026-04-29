@@ -3,7 +3,7 @@ from django.forms.widgets import ClearableFileInput
 from django.forms.utils import flatatt
 from django.utils.safestring import mark_safe
 
-from .models import Worker
+from .models import Worker, Task
 
 
 class CustomClearableFileInput(ClearableFileInput):
@@ -60,5 +60,30 @@ class WorkerUpdateForm(forms.ModelForm):
                         "rounded-pill shadow-sm"
                     )
                 }
+            ),
+        }
+
+
+class TaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = [
+            "name",
+            "description",
+            "deadline",
+            "priority",
+            "is_completed",
+            "task_type",
+            "assignees",
+        ]
+        widgets = {
+            "assignees": forms.CheckboxSelectMultiple(),
+            "deadline": forms.DateInput(
+                attrs={
+                    "type": "date",
+                }
+            ),
+            "is_completed": forms.CheckboxInput(
+                attrs={"class": "form-check-input"}
             ),
         }

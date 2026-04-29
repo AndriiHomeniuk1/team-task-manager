@@ -10,16 +10,18 @@ from django.db.models import Value, QuerySet
 from django.db.models.functions import Concat
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.views import generic
 
 from tasks.models import Position, TaskType, Worker, Task
-from .forms import WorkerUpdateForm
+from .forms import WorkerUpdateForm, TaskForm
 from .utils import (
     get_position_messages,
     get_tasktype_messages,
+    get_task_messages,
     apply_search,
+    filter_tasks,
 )
 
 
@@ -283,5 +285,119 @@ class WorkerSelfDeactivateView(
         return super().form_valid(form)
 
 
-class TaskListView(generic.ListView):
+class TaskListView(LoginRequiredMixin, PageSizeMixin, generic.ListView):
     model = Task
+    context_object_name = "tasks"
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = apply_search(
+            queryset,
+            self.request.GET,
+            [
+                "name",
+                "pk",
+            ],
+        )
+        queryset = filter_tasks(queryset, self.request.GET)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "priorities": Task._meta.get_field("priority").choices,
+                "completed_choices": [("true", "True"), ("false", "False")],
+                "task_types": TaskType.objects.all(),
+                "next_url": reverse("tasks:task-list"),
+            }
+        )
+        return context
+
+
+class TaskDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Task
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["next_url"] = reverse("tasks:task-list")
+        return context
+
+
+class TaskCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Task
+    form_class = TaskForm
+    template_name = "tasks/task_form.html"
+    success_url = reverse_lazy("tasks:task-list")
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+
+class TaskUpdateView(
+    LoginRequiredMixin,
+    UserPassesTestMixin,
+    generic.UpdateView
+):
+    model = Task
+    form_class = TaskForm
+    template_name = "tasks/task_form.html"
+
+    def test_func(self):
+        task = self.get_object()
+        user = self.request.user
+        if user.is_superuser or user.has_perm("tasks.change_task"):
+            return True
+        return task.created_by == user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["next_url"] = self.request.GET.get(
+            "next", reverse("tasks:task-list"))
+        return context
+
+    def get_success_url(self):
+        next_param = self.request.GET.get("next")
+        url = reverse(
+            "tasks:task-detail", kwargs={"pk": self.object.pk})
+        return f"{url}?next={next_param}" if next_param else url
+
+
+class TaskDeleteView(
+    LoginRequiredMixin,
+    UserPassesTestMixin,
+    generic.DeleteView
+):
+    model = Task
+    template_name = "tasks/confirm_delete.html"
+
+    def test_func(self):
+        task = self.get_object()
+        user = self.request.user
+        if user.is_superuser or user.has_perm("tasks.delete_task"):
+            return True
+        return task.created_by == user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        next_url = self.request.GET.get(
+            "next", reverse_lazy("tasks:task-list"))
+        context.update(
+            {
+                "delete_type": "task",
+                "success_url": next_url,
+                "cancel_url": reverse_lazy(
+                    "tasks:task-detail", kwargs={"pk": self.object.pk}
+                )
+                + f"?next={next_url}",
+            }
+        )
+        context.update(get_task_messages(self.object))
+        return context
+
+    def get_success_url(self):
+        return self.request.GET.get(
+            "next", str(reverse_lazy("tasks:task-list")))

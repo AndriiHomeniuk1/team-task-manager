@@ -10,3 +10,5 @@ TASKTYPE_MESSAGES = {
     "ASSIGNED": "This task type cannot be deleted because it is used in the following {task_noun}:",
     "EXTRA": "...and {count} other {task_noun} are linked to this task type.",
 }
+
+TASK_MESSAGES = {"CONFIRM": "Are you sure you want to delete the task '{object}'?"}
