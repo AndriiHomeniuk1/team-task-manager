@@ -1,0 +1,137 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12 col-md-8 mx-auto">
+      <div class="card shadow-lg border-radius-xl">
+        <div class="card-header bg-gradient-primary border-radius-lg p-4">
+          <h4 class="text-white mb-0">
+            {% if form.instance.pk %}
+              <i class="fas fa-user-edit me-2"></i> Update Worker
+            {% else %}
+              <i class="fas fa-user-plus me-2"></i> Create Worker
+            {% endif %}
+          </h4>
+          <p class="text-white-50 mb-0">Fill in the worker details below</p>
+        </div>
+
+        <div class="card-body p-4">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- Username -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Username</label>
+              <input type="text" name="username" value="{{ form.username.value|default:'' }}"
+                     class="form-control border px-3 py-2 rounded-pill shadow-sm" placeholder="Enter username">
+              {% for error in form.username.errors %}
+                <p class="form-error mt-2">{{ error }}</p>
+              {% endfor %}
+            </div>
+
+            <!-- First name -->
+            <div class="mb-3">
+              <label class="form-label text-dark">First name</label>
+              <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}"
+                     class="form-control border px-3 py-2 rounded-pill shadow-sm" placeholder="Enter first name">
+              {% for error in form.first_name.errors %}
+                <p class="form-error mt-2">{{ error }}</p>
+              {% endfor %}
+            </div>
+
+            <!-- Last name -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Last name</label>
+              <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}"
+                     class="form-control border px-3 py-2 rounded-pill shadow-sm" placeholder="Enter last name">
+              {% for error in form.last_name.errors %}
+                <p class="form-error mt-2">{{ error }}</p>
+              {% endfor %}
+            </div>
+
+            <!-- Position -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Position</label>
+              {{ form.position|add_class:"form-select border px-3 py-2 rounded-pill shadow-sm" }}
+            </div>
+
+            <!-- Phone -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Phone</label>
+              <input type="text" name="phone_number" value="{{ form.phone_number.value|default:'' }}"
+                     class="form-control border px-3 py-2 rounded-pill shadow-sm" placeholder="Enter phone number">
+              {% for error in form.phone_number.errors %}
+                <p class="form-error mt-2">{{ error }}</p>
+              {% endfor %}
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Email</label>
+              <input type="email" name="email" value="{{ form.email.value|default:'' }}"
+                     class="form-control border px-3 py-2 rounded-pill shadow-sm" placeholder="Enter email">
+              {% for error in form.email.errors %}
+                <p class="form-error mt-2">{{ error }}</p>
+              {% endfor %}
+            </div>
+
+            <!-- Location -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Location</label>
+              <input type="text" name="location" value="{{ form.location.value|default:'' }}"
+                     class="form-control border px-3 py-2 rounded-pill shadow-sm" placeholder="Enter location">
+              {% for error in form.location.errors %}
+                <p class="form-error mt-2">{{ error }}</p>
+              {% endfor %}
+            </div>
+
+            <!-- GitHub -->
+            <div class="mb-3">
+              <label class="form-label text-dark">GitHub</label>
+              <input type="url" name="github_url" value="{{ form.github_url.value|default:'' }}"
+                     class="form-control border px-3 py-2 rounded-pill shadow-sm" placeholder="Enter GitHub profile URL">
+              {% for error in form.github_url.errors %}
+                <p class="form-error mt-2">{{ error }}</p>
+              {% endfor %}
+            </div>
+
+            <!-- Avatar -->
+            <div class="mb-4">
+              <label for="id_avatar" class="form-label text-dark">Avatar</label>
+              <div class="d-flex flex-column align-items-start gap-3">
+                <img id="avatarPreview"
+                     src="{% if form.instance.avatar %}{{ form.instance.avatar.url }}{% else %}{% static 'assets/img/default_avatar.png' %}{% endif %}"
+                     alt="avatar preview"
+                     class="avatar avatar-lg shadow-sm rounded-circle border mb-2">
+                {% if form.instance.avatar %}
+                  <div class="form-check mb-2">
+                    <input type="checkbox" name="avatar-clear" id="id_avatar_clear" class="form-check-input">
+                    <label for="id_avatar_clear" class="form-check-label text-dark">Remove avatar</label>
+                  </div>
+                {% endif %}
+                <input type="file" name="avatar" id="id_avatar"
+                       class="form-control border px-3 py-2 rounded-pill shadow-sm">
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <a href="{% url 'tasks:worker-list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back
+              </a>
+              <button type="submit" class="btn btn-primary">
+                {% if form.instance.pk %}
+                  <i class="fas fa-save me-2"></i> Update Worker
+                {% else %}
+                  <i class="fas fa-plus me-2"></i> Create Worker
+                {% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
