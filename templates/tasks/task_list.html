@@ -164,7 +164,7 @@
                     </td>
                     <td class="assignees-col">
                       <div class="avatar-group mt-2">
-                        {% for worker in task.assignees.all|slice:":12" %}
+                        {% for worker in task.assignees.all|slice:":10" %}
                         <a href="{% url 'tasks:worker-detail' worker.pk %}" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{ worker.username }}">
                         {% if worker.avatar %}
                           <img src="{{ worker.avatar.url }}" alt="{{ worker.username }}">
@@ -173,9 +173,9 @@
                         {% endif %}
                         </a>
                         {% endfor %}
-                        {% if task.assignees.count > 12 %}
+                        {% if task.assignees.count > 10 %}
                           <span class="avatar avatar-xs rounded-circle bg-secondary text-white">
-                            +{{ task.assignees.count|add:"-12" }}
+                            +{{ task.assignees.count|add:"-10" }}
                           </span>
                         {% endif %}
                       </div>
