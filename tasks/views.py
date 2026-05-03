@@ -259,7 +259,7 @@ class WorkerUpdateView(
     form_class = WorkerUpdateForm
     template_name = "tasks/worker_form.html"
     context_object_name = "worker"
-    success_url = reverse_lazy("tasks:worker-list")
+    success_url = reverse_lazy("tasks:profile")
 
     def test_func(self):
         worker = self.get_object()
