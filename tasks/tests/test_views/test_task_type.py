@@ -6,6 +6,7 @@ from django.contrib.auth.models import Permission
 
 from tasks.models import Worker, TaskType, Task
 from tasks.views import TaskTypeListView
+from tasks.tests.test_views.test_redirect_base import BaseRedirectTests
 
 
 class BaseTaskTypeTests(TestCase):
@@ -31,26 +32,16 @@ class BaseTaskTypeTests(TestCase):
             TaskType.objects.create(name=f"TaskType{i}")
 
 
-class TaskTypeRedirectTests(BaseTaskTypeTests):
+class TaskTypeRedirectTests(BaseTaskTypeTests, BaseRedirectTests):
     def setUp(self):
         super().setUp()
         self.client.logout()
-
-    def test_redirect_if_not_logged_in(self):
-        response = self.client.get(self.url_list)
-        self.assertEqual(response.status_code, 302)
-
-    def test_redirect_create_if_not_logged_in(self):
-        response = self.client.get(self.url_create)
-        self.assertEqual(response.status_code, 302)
-
-    def test_redirect_update_if_not_logged_in(self):
-        response = self.client.get(self.url_update)
-        self.assertEqual(response.status_code, 302)
-
-    def test_redirect_delete_if_not_logged_in(self):
-        response = self.client.get(self.url_delete)
-        self.assertEqual(response.status_code, 302)
+        self.urls_to_test = {
+            "list": self.url_list,
+            "create": self.url_create,
+            "update": self.url_update,
+            "delete": self.url_delete,
+        }
 
 
 class TaskTypeListViewTests(BaseTaskTypeTests):

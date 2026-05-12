@@ -1,5 +1,14 @@
 from django.urls import reverse
 from tasks.tests.test_views.test_task import BaseTaskTests
+from tasks.tests.test_views.test_redirect_base import BaseRedirectTests
+
+
+class UserTaskRedirectTests(BaseRedirectTests):
+    def setUp(self):
+        super().setUp()
+        self.urls_to_test = {
+            "user_tasks": reverse("tasks:user-task-list"),
+        }
 
 
 class UserTaskListViewTests(BaseTaskTests):
@@ -7,11 +16,6 @@ class UserTaskListViewTests(BaseTaskTests):
         super().setUp()
         self.url_user_tasks = reverse("tasks:user-task-list")
         self.response = self.client.get(self.url_user_tasks)
-
-    def test_redirect_if_not_logged_in(self):
-        self.client.logout()
-        response = self.client.get(self.url_user_tasks)
-        self.assertEqual(response.status_code, 302)
 
     def test_list_view_access_logged_in(self):
         self.assertEqual(self.response.status_code, 200)

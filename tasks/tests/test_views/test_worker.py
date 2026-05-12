@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from tasks.models import Worker, Position
 from tasks.views import WorkerListView
+from tasks.tests.test_views.test_redirect_base import BaseRedirectTests
 
 
 class BaseWorkerTests(TestCase):
@@ -60,26 +61,16 @@ class BaseWorkerTests(TestCase):
             )
 
 
-class WorkerRedirectTests(BaseWorkerTests):
+class WorkerRedirectTests(BaseWorkerTests, BaseRedirectTests):
     def setUp(self):
         super().setUp()
         self.client.logout()
-
-    def test_redirect_if_not_logged_in(self):
-        response = self.client.get(self.url_list)
-        self.assertEqual(response.status_code, 302)
-
-    def test_redirect_detail_if_not_logged_in(self):
-        response = self.client.get(self.url_detail)
-        self.assertEqual(response.status_code, 302)
-
-    def test_redirect_update_if_not_logged_in(self):
-        response = self.client.get(self.url_update_self)
-        self.assertEqual(response.status_code, 302)
-
-    def test_redirect_deactivate_if_not_logged_in_self(self):
-        response = self.client.get(self.url_deactivate_self)
-        self.assertEqual(response.status_code, 302)
+        self.urls_to_test = {
+            "list": self.url_list,
+            "detail": self.url_detail,
+            "update": self.url_update_self,
+            "deactivate": self.url_deactivate_self,
+        }
 
 
 class WorkerListViewTests(BaseWorkerTests):

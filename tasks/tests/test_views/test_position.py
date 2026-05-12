@@ -4,6 +4,7 @@ from django.contrib.auth.models import Permission
 
 from tasks.models import Worker, Position
 from tasks.views import PositionListView
+from tasks.tests.test_views.test_redirect_base import BaseRedirectTests
 
 
 class BasePositionTests(TestCase):
@@ -30,26 +31,16 @@ class BasePositionTests(TestCase):
             Position.objects.create(name=f"Position{i}")
 
 
-class PositionRedirectTests(BasePositionTests):
+class PositionRedirectTests(BasePositionTests, BaseRedirectTests):
     def setUp(self):
         super().setUp()
         self.client.logout()
-
-    def test_redirect_if_not_logged_in(self):
-        response = self.client.get(self.url_list)
-        self.assertEqual(response.status_code, 302)
-
-    def test_redirect_create_if_not_logged_in(self):
-        response = self.client.get(self.url_create)
-        self.assertEqual(response.status_code, 302)
-
-    def test_redirect_update_if_not_logged_in(self):
-        response = self.client.get(self.url_update)
-        self.assertEqual(response.status_code, 302)
-
-    def test_redirect_delete_if_not_logged_in(self):
-        response = self.client.get(self.url_delete)
-        self.assertEqual(response.status_code, 302)
+        self.urls_to_test = {
+            "list": self.url_list,
+            "create": self.url_create,
+            "update": self.url_update,
+            "delete": self.url_delete,
+        }
 
 
 class PositionListViewTests(BasePositionTests):

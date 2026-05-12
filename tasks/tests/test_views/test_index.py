@@ -4,18 +4,15 @@ from django.test import TestCase
 from django.urls import reverse
 
 from tasks.models import TaskType, Worker, Task
+from tasks.tests.test_views.test_redirect_base import BaseRedirectTests
 
 
-class IndexRedirectTests(TestCase):
+class IndexRedirectTests(BaseRedirectTests):
     def setUp(self):
-        self.worker = Worker.objects.create_user(
-            username="john_doe",
-            password="testpassword123"
-        )
-
-    def test_redirect_if_not_logged_in(self):
-        response = self.client.get(reverse("tasks:index"))
-        self.assertEqual(response.status_code, 302)
+        super().setUp()
+        self.urls_to_test = {
+            "index": reverse("tasks:index"),
+        }
 
 
 class IndexTests(TestCase):
