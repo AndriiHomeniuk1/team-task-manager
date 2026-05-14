@@ -6,10 +6,13 @@ from PIL import Image
 from django import forms
 from django.test import TestCase, SimpleTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.contrib.auth import get_user_model
 
 from tasks.forms import CustomClearableFileInput, WorkerUpdateForm, TaskForm
-from tasks.models import Worker, TaskType
+from tasks.models import TaskType
 
+
+User = get_user_model()
 
 class CustomClearableFileInputTests(SimpleTestCase):
     def setUp(self):
@@ -39,7 +42,7 @@ class CustomClearableFileInputTests(SimpleTestCase):
 
 class WorkerUpdateFormTests(TestCase):
     def setUp(self):
-        self.worker = Worker.objects.create_user(
+        self.worker = User.objects.create_user(
             username="john_doe",
             password="testpassword123",
             email = "john@example.com"
@@ -104,10 +107,10 @@ class WorkerUpdateFormTests(TestCase):
 
 class TaskFormTests(TestCase):
     def setUp(self):
-        self.creator = Worker.objects.create_user(
+        self.creator = User.objects.create_user(
             username="creator", password="pass123", email="creator@example.com"
         )
-        self.assignee = Worker.objects.create_user(
+        self.assignee = User.objects.create_user(
             username="assignee",
             password="pass123",
             email="assignee@example.com"

@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test import SimpleTestCase
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 
 from accounts.forms import (
     UserPasswordResetForm,
@@ -12,8 +13,9 @@ from accounts.views import (
     UserPasswordResetConfirmView,
     UserPasswordChangeView
 )
-from tasks.models import Worker
 
+
+User = get_user_model()
 
 class UserLoginViewTests(TestCase):
     def test_get_login_returns_form(self):
@@ -41,7 +43,7 @@ class RegisterViewTests(TestCase):
             "password2": "StrongPass123!",
         })
         self.assertRedirects(response, self.login_url)
-        self.assertTrue(Worker.objects.filter(username="newuser").exists())
+        self.assertTrue(User.objects.filter(username="newuser").exists())
 
     def test_post_invalid_data_shows_errors(self):
         response = self.client.post(self.register_url, {

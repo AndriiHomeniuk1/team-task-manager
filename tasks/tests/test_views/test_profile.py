@@ -1,9 +1,11 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 
-from tasks.models import Worker
 from tasks.tests.test_views.test_redirect_base import BaseRedirectTests
 
+
+User = get_user_model()
 
 class ProfileRedirectTests(BaseRedirectTests):
     def setUp(self):
@@ -15,7 +17,7 @@ class ProfileRedirectTests(BaseRedirectTests):
 
 class ProfileTests(TestCase):
     def setUp(self):
-        self.worker = Worker.objects.create_user(
+        self.worker = User.objects.create_user(
             username="john_doe",
             password="testpassword123",
             first_name="John",

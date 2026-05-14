@@ -1,17 +1,20 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import Permission
+from django.contrib.auth import get_user_model
 
-from tasks.models import Worker, Position
+from tasks.models import Position
 from tasks.views import PositionListView
 from tasks.tests.test_views.test_redirect_base import BaseRedirectTests
 
+
+User = get_user_model()
 
 class BasePositionTests(TestCase):
     def setUp(self):
         self.url_list = reverse("tasks:position-list")
         self.url_create = reverse("tasks:position-create")
-        self.worker = Worker.objects.create_user(
+        self.worker = User.objects.create_user(
             username="john_doe",
             password="testpassword123"
         )

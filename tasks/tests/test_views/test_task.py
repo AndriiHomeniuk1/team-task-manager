@@ -3,15 +3,18 @@ from datetime import date, timedelta
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import Permission
+from django.contrib.auth import get_user_model
 
-from tasks.models import Task, TaskType, Worker
+from tasks.models import Task, TaskType
 from tasks.views import TaskListView
 from tasks.tests.test_views.test_redirect_base import BaseRedirectTests
 
 
+User = get_user_model()
+
 class BaseTaskTests(TestCase):
     def setUp(self):
-        self.worker = Worker.objects.create_user(
+        self.worker = User.objects.create_user(
             username="john_doe",
             password="testpassword123",
             first_name="John",
@@ -20,7 +23,7 @@ class BaseTaskTests(TestCase):
         )
         self.client.login(username="john_doe", password="testpassword123")
 
-        self.other_user = Worker.objects.create_user(
+        self.other_user = User.objects.create_user(
             username="anna_dev",
             password="pass123",
             first_name="Anna",

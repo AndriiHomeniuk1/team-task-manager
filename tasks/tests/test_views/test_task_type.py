@@ -3,17 +3,20 @@ from datetime import date
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import Permission
+from django.contrib.auth import get_user_model
 
-from tasks.models import Worker, TaskType, Task
+from tasks.models import TaskType, Task
 from tasks.views import TaskTypeListView
 from tasks.tests.test_views.test_redirect_base import BaseRedirectTests
 
+
+User = get_user_model()
 
 class BaseTaskTypeTests(TestCase):
     def setUp(self):
         self.url_list = reverse("tasks:task-type-list")
         self.url_create = reverse("tasks:task-type-create")
-        self.worker = Worker.objects.create_user(
+        self.worker = User.objects.create_user(
             username="john_doe",
             password="testpassword123"
         )

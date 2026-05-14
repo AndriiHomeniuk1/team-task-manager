@@ -1,17 +1,20 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 
-from tasks.models import Worker, Position
+from tasks.models import Position
 from tasks.views import WorkerListView
 from tasks.tests.test_views.test_redirect_base import BaseRedirectTests
 
+
+User = get_user_model()
 
 class BaseWorkerTests(TestCase):
     def setUp(self):
         self.position_dev = Position.objects.create(name="Developer")
         self.position_qa = Position.objects.create(name="QA")
 
-        self.worker = Worker.objects.create_user(
+        self.worker = User.objects.create_user(
             username="john_doe",
             password="testpassword123",
             first_name="John",
@@ -21,7 +24,7 @@ class BaseWorkerTests(TestCase):
         )
         self.client.login(username="john_doe", password="testpassword123")
 
-        self.other_worker = Worker.objects.create_user(
+        self.other_worker = User.objects.create_user(
             username="anna_dev",
             password="pass345",
             first_name="Anna",
@@ -29,7 +32,7 @@ class BaseWorkerTests(TestCase):
             position=self.position_dev,
             is_active=True,
         )
-        Worker.objects.create_user(
+        User.objects.create_user(
             username="inactive_user",
             password="pass321",
             first_name="Inactive",
@@ -52,7 +55,7 @@ class BaseWorkerTests(TestCase):
         self.expected_paginate_by = WorkerListView.paginate_by
 
         for i in range(5):
-            Worker.objects.create_user(
+            User.objects.create_user(
                 username=f"user{i}",
                 password="pass123",
                 first_name=f"First{i}",
