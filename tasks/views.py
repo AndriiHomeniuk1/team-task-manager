@@ -337,6 +337,12 @@ class TaskCreateView(LoginRequiredMixin, generic.CreateView):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["next_url"] = self.request.GET.get(
+            "next", reverse("tasks:task-list"))
+        return context
+
 
 class TaskUpdateView(
     LoginRequiredMixin,

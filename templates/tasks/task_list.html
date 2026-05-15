@@ -110,7 +110,7 @@
         <div class="card mb-4">
           <div class="card-header pb-0 d-flex justify-content-between align-items-center">
             <h6>Task table</h6>
-            <a class="btn bg-gradient-faded-secondary-vertical mb-0" href="{% url 'tasks:task-create' %}">
+            <a class="btn bg-gradient-faded-secondary-vertical mb-0" href="{% url 'tasks:task-create' %}?next={{ next_url }}">
               <i class="fas fa-plus"></i>&nbsp;&nbsp;Add New Task
             </a>
           </div>
