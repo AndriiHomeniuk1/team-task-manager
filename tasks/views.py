@@ -223,6 +223,7 @@ class WorkerListView(LoginRequiredMixin, PageSizeMixin, generic.ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(is_active=True)
+        queryset = queryset.select_related("position")
         queryset = queryset.annotate(
             full_name=Concat("first_name", Value(" "), "last_name")
         )
@@ -248,6 +249,9 @@ class WorkerDetailView(LoginRequiredMixin, generic.DetailView):
     model = Worker
     template_name = "tasks/profile.html"
     context_object_name = "worker"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("position")
 
 
 class WorkerUpdateView(
@@ -293,6 +297,9 @@ class TaskListView(LoginRequiredMixin, PageSizeMixin, generic.ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        queryset = queryset.select_related(
+            "task_type",
+        ).prefetch_related("assignees")
         queryset = apply_search(
             queryset,
             self.request.GET,
@@ -320,6 +327,15 @@ class TaskListView(LoginRequiredMixin, PageSizeMixin, generic.ListView):
 
 class TaskDetailView(LoginRequiredMixin, generic.DetailView):
     model = Task
+
+    def get_queryset(self):
+        return (
+            super().get_queryset().select_related(
+                "task_type",
+                "created_by",
+                "created_by__position"
+            ).prefetch_related("assignees__position")
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -418,6 +434,9 @@ class UserTaskListView(LoginRequiredMixin, PageSizeMixin, generic.ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        queryset = queryset.select_related(
+            "task_type",
+        ).prefetch_related("assignees")
         queryset = queryset.filter(assignees=self.request.user)
         queryset = apply_search(
             queryset, self.request.GET, ["name", "pk"])
