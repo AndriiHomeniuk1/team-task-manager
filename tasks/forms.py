@@ -65,6 +65,14 @@ class WorkerUpdateForm(forms.ModelForm):
 
 
 class TaskForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["assignees"].queryset = (
+            Worker.objects.select_related("position")
+            .filter(is_active=True)
+        )
+
     class Meta:
         model = Task
         fields = [
