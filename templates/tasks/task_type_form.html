@@ -1,0 +1,54 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12 col-md-8 mx-auto">
+      <div class="card shadow-lg border-radius-xl">
+        <div class="card-header bg-gradient-primary border-radius-lg p-4">
+          <h4 class="text-white mb-0">
+            {% if form.instance.pk %}
+              <i class="fas fa-edit me-2"></i> Update Task Type
+            {% else %}
+              <i class="fas fa-plus me-2"></i> Create Task Type
+            {% endif %}
+          </h4>
+          <p class="text-white-50 mb-0">Define a new task category</p>
+        </div>
+
+        <div class="card-body p-4">
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label text-dark">Task Type Name</label>
+              <input type="text" name="name" value="{{ form.name.value|default:'' }}"
+                     class="form-control border px-3 py-2 rounded-pill shadow-sm"
+                     placeholder="Enter task type name">
+              {% if form.name.errors %}
+                {% for error in form.name.errors %}
+                  <p class="form-error mt-2">{{ error }}</p>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <a href="{% url 'tasks:task-type-list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back
+              </a>
+              <button type="submit" class="btn btn-primary">
+                {% if form.instance.pk %}
+                  <i class="fas fa-save me-2"></i> Update Task Type
+                {% else %}
+                  <i class="fas fa-plus me-2"></i> Create Task Type
+                {% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,41 @@
+{% extends 'layouts/base-auth.html' %}
+{% load i18n static %}
+
+{% block content %}
+  <main class="main-content mt-0">
+    <section class="min-vh-100 mb-8">
+      <div class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg"
+           style="background-image: url('{% static "assets/img/curved-images/curved5.jpg" %}');">
+        <span class="mask bg-gradient-dark opacity-6"></span>
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-6 text-center mx-auto">
+              <h1 class="text-white mb-2 mt-5">You are logged out</h1>
+              <p class="text-lead text-white">
+                Thanks for using <strong>Team Task Manager</strong>.
+                Your session has ended successfully.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-5 mx-auto">
+            <div class="card card-body shadow border-0 p-4">
+              <div class="text-center mb-4">
+                <h2 class="h5 text-dark">See you soon!</h2>
+                <p class="text-muted">You can log in again or return to your tasks.</p>
+              </div>
+              <div class="d-grid gap-2">
+                <a href="{% url 'accounts:login' %}" class="btn btn-primary">
+                  Log in again
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+{% endblock %}

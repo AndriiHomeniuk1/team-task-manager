@@ -1,0 +1,143 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12 col-md-8 mx-auto">
+      <div class="card shadow-lg border-radius-xl">
+        <div class="card-header bg-gradient-primary border-radius-lg p-4">
+          <h4 class="text-white mb-0">
+            {% if form.instance.pk %}
+              <i class="fas fa-edit me-2"></i> Update Task
+            {% else %}
+              <i class="fas fa-plus me-2"></i> Create Task
+            {% endif %}
+          </h4>
+          <p class="text-white-50 mb-0">Fill in the details below</p>
+        </div>
+
+        <div class="card-body p-4">
+          <form method="post">
+            {% csrf_token %}
+            <!-- Name -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Task Name</label>
+              <input type="text" name="name" value="{{ form.name.value|default:'' }}"
+                     class="form-control border px-3 py-2 rounded-pill shadow-sm" placeholder="Enter task name">
+              {% if form.name.errors %}
+                {% for error in form.name.errors %}
+                  <p class="form-error mt-2">{{ error }}</p>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Description</label>
+              <textarea name="description" rows="4"
+                        class="form-control border px-3 py-2 rounded-3 shadow-sm"
+                        placeholder="Enter description">{{ form.description.value|default:'' }}</textarea>
+              {% if form.description.errors %}
+                {% for error in form.description.errors %}
+                  <p class="form-error mt-2">{{ error }}</p>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <!-- Deadline -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Deadline</label>
+              <input type="text" name="deadline" id="deadlinePicker"
+                     value="{{ form.deadline.value|default:'' }}"
+                     class="form-control border px-3 py-2 rounded-pill shadow-sm"
+                     placeholder="Select deadline">
+              {% if form.deadline.errors %}
+                {% for error in form.deadline.errors %}
+                  <p class="form-error mt-2">{{ error }}</p>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <!-- Priority -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Priority</label>
+              {{ form.priority|add_class:"form-select border px-3 py-2 rounded-pill shadow-sm" }}
+            </div>
+
+            <!-- Task Type -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Task Type</label>
+              {{ form.task_type|add_class:"form-select border px-3 py-2 rounded-pill shadow-sm" }}
+            </div>
+
+            <!-- Is completed -->
+            {% if form.instance.pk %}
+              <div class="form-check-inline mb-3">
+                {{ form.is_completed|add_class:"custom-check-input" }}
+                <label class="custom-check-label text-dark" for="id_is_completed">
+                  Mark as Completed
+                </label>
+              </div>
+            {% endif %}
+
+            <!-- Assignees -->
+            <div class="mb-3">
+              <label class="form-label text-dark">Assignees</label>
+              <div class="row">
+                {% for worker in form.assignees.field.queryset %}
+                  <div class="col-12 col-md-4 mb-3">
+                    <label class="d-flex align-items-center border rounded-pill px-2 py-2 shadow-sm cursor-pointer w-100">
+                      <input type="checkbox" name="assignees" value="{{ worker.pk }}"
+                             {% if worker.pk in form.assignees.value %}checked{% endif %}
+                             class="custom-check-input me-2">
+                      {% if worker.avatar %}
+                        <img src="{{ worker.avatar.url }}" class="avatar avatar-sm me-2" alt="{{ worker.username }}">
+                      {% else %}
+                        <img src="{% static 'assets/img/default_avatar.png' %}" class="avatar avatar-sm me-2" alt="default">
+                      {% endif %}
+                      <div class="text-truncate">
+                        <h6 class="mb-0 text-sm">{{ worker.get_full_name }}</h6>
+                        <p class="text-xs text-secondary mb-0">{{ worker.position }}</p>
+                      </div>
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+              {% if form.assignees.errors %}
+                {% for error in form.assignees.errors %}
+                  <p class="form-error mt-2">{{ error }}</p>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              {% if form.instance.pk %}
+                <a href="{% url 'tasks:task-detail' form.instance.pk %}?next={{ next_url }}"
+                   class="btn btn-outline-secondary">
+                  <i class="fas fa-arrow-left me-2"></i> Cancel
+                </a>
+              {% else %}
+                <a href="{{ next_url }}" class="btn btn-outline-secondary">
+                  <i class="fas fa-arrow-left me-2"></i> Cancel
+                </a>
+              {% endif %}
+
+              <button type="submit" class="btn btn-primary">
+                {% if form.instance.pk %}
+                  <i class="fas fa-save me-2"></i> Update Task
+                {% else %}
+                  <i class="fas fa-plus me-2"></i> Create Task
+                {% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

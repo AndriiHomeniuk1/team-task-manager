@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="soft-ui-container">
+    <div class="card soft-ui-card shadow-lg p-5 text-center">
+        <div class="icon-circle mb-4">
+            <img src="{% static 'assets/images/icon-warning.svg' %}" alt="Warning" width="64" height="64">
+        </div>
+        <h2 class="mb-3">Deactivate Account</h2>
+        <p class="text-muted mb-4">
+            You are about to deactivate your account <strong>{{ worker.username }}</strong>.
+            After deactivation, you will not be able to log in until an administrator reactivates your account.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-lg soft-ui-btn">
+                Confirm Deactivation
+            </button>
+            <a href="{% url 'tasks:worker-detail' worker.pk %}" class="btn btn-secondary btn-lg soft-ui-btn ms-3">
+                Cancel
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

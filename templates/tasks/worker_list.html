@@ -1,0 +1,143 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+
+<style>
+
+  .height{
+        height: 40px !important;
+    }
+
+  .form-select {
+    width: auto;
+    padding-right: 2rem;
+  }
+</style>
+
+{% endblock extrastyle %}
+
+
+{% block content %}
+
+  <div class="container-fluid py-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between mb-4">
+          <form method="get" id="mainFilterForm" class="d-flex gap-4 align-items-start w-100 justify-content-between">
+            <!-- SEARCH -->
+            <div class="search">
+              <div class="d-flex gap-3 align-items-start">
+                <input type="text"
+                       placeholder="Search worker..."
+                       name="search"
+                       value="{{ request.GET.search }}"
+                       class="form-control">
+                <button type="submit" class="btn btn-primary px-3">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- FILTERS -->
+            <div class="mb-0">
+              <div class="d-flex gap-3 align-items-center mb-0">
+                <h5>Filters</h5>
+                <button id="workerAddButton" type="button" class="btn btn-primary">Add</button>
+              </div>
+
+              <div id="workerInputContainer"></div>
+
+              <button id="workerSubmitButton"
+                      type="submit"
+                      class="btn btn-success"
+                      style="display:none;">
+                Submit
+              </button>
+            </div>
+
+            <!-- PAGE SIZE -->
+            <div class="page-size">
+              <select id="pageSizeSelect" name="page_size" class="form-select">
+                <option value="5" {% if request.GET.page_size == "5" %}selected{% endif %}>5 Items</option>
+                <option value="10" {% if request.GET.page_size == "10" %}selected{% endif %}>10 Items</option>
+                <option value="25" {% if request.GET.page_size == "25" %}selected{% endif %}>25 Items</option>
+                <option value="50" {% if request.GET.page_size == "50" %}selected{% endif %}>50 Items</option>
+              </select>
+            </div>
+          </form>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header pb-0">
+            <h6>Worker table</h6>
+          </div>
+          <div class="card-body px-0 pt-0 pb-2">
+            <div class="table-responsive p-0">
+              <table class="table align-items-center mb-0">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Worker</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Position</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">First name</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Last name</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for worker in workers %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'tasks:worker-detail' worker.pk %}" class="text-decoration-none text-dark">
+                        <div class="d-flex px-2 py-1">
+                          <div>
+                            {% if worker.avatar %}
+                            <img src="{{ worker.avatar.url }}" class="avatar avatar-sm me-3" alt="{{ worker.username }}">
+                            {% else %}
+                            <img src="{% static 'assets/img/default_avatar.png' %}" class="avatar avatar-sm me-3" alt="default">
+                            {% endif %}
+                          </div>
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm">{{ worker.username }}</h6>
+                            <p class="text-xs text-secondary mb-0">{{ worker.email }}</p>
+                          </div>
+                        </div>
+                      </a>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">
+                        {% if worker.position %}
+                          {{ worker.position }}
+                        {% else %}
+                          -
+                        {% endif %}
+                      </p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">
+                        {% if worker.first_name %}
+                        {{ worker.first_name }}
+                        {% else %}
+                          -
+                        {% endif %}
+                      </p>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">
+                        {% if worker.last_name %}
+                        {{ worker.last_name }}
+                        {% else %}
+                          -
+                        {% endif %}
+                      </p>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

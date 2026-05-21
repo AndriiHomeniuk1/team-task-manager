@@ -1,0 +1,119 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+
+  <div class="container-fluid">
+    <div class="page-header min-height-250 border-radius-lg mt-4 d-flex flex-column justify-content-end">
+      <span class="mask bg-primary opacity-9"></span>
+      <div class="w-100 position-relative p-3">
+        <div class="d-flex justify-content-between align-items-end">
+          <div class="d-flex align-items-center">
+            <div class="avatar avatar-xl position-relative me-3">
+              {% if worker.avatar %}
+                <img src="{{ worker.avatar.url }}"
+                     alt="profile_image"
+                     class="w-100 border-radius-lg shadow-sm cursor-pointer"
+                     data-bs-toggle="modal"
+                     data-bs-target="#avatarModal">
+              {% else %}
+                <img src="{% static 'assets/img/default_avatar.png' %}" alt="profile_image" class="w-100 border-radius-lg bg-gray-200">
+              {% endif %}
+            </div>
+
+            <div>
+              <h5 class="mb-1 text-white font-weight-bolder">
+                {{ worker.first_name }} {{ worker.last_name }}
+              </h5>
+              <p class="mb-0 text-white text-sm">
+                {% if worker.position %}
+                  {{ worker.position }}
+                {% else %}
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="avatarModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-transparent border-0">
+        <img src="{% if worker.avatar %}{{ worker.avatar.url }}{% else %}{% static 'assets/img/default_avatar.png' %}{% endif %}"
+             class="img-fluid rounded shadow">
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-4 ps-4">
+    <div class="card h-100">
+      <div class="card-header pb-0 p-3">
+        <div class="row">
+          <div class="col-md-8 d-flex align-items-center">
+            <h6 class="mb-0">Profile Information</h6>
+          </div>
+          <div class="col-md-4 text-end">
+            {% if request.user == worker %}
+              <a href="{% url 'tasks:worker-update' worker.pk %}" class="me-3">
+                <i class="fas fa-user-edit text-secondary text-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile"></i>
+              </a>
+              <a href="{% url 'accounts:password_change' %}" class="me-3">
+                <i class="fas fa-key text-secondary text-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Change Password"></i>
+              </a>
+              <a href="{% url 'tasks:worker-deactivate' worker.pk %}">
+                <i class="fas fa-user-slash text-danger text-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Deactivate Account"></i>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-3">
+        <hr class="horizontal gray-light my-2">
+        <ul class="list-group">
+          <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Username:</strong> &nbsp; {{ worker.username }}</li>
+          <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">First name:</strong> &nbsp; {{ worker.first_name }}</li>
+          <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Last name:</strong> &nbsp; {{ worker.last_name }}</li>
+          <li class="list-group-item border-0 ps-0 text-sm">
+            <strong class="text-dark">Position:</strong> &nbsp;
+            {% if worker.position %}
+              {{ worker.position }}
+            {% else %}
+            {% endif %}
+          </li>
+          <li class="list-group-item border-0 ps-0 text-sm">
+            <strong class="text-dark">Phone:</strong> &nbsp;
+            {% if worker.phone_number %}
+              {{ worker.phone_number }}
+            {% else %}
+            {% endif %}
+          </li>
+          <li class="list-group-item border-0 ps-0 text-sm">
+            <strong class="text-dark">Email:</strong> &nbsp;
+            {{ worker.email }}
+          </li>
+
+          <li class="list-group-item border-0 ps-0 text-sm">
+            <strong class="text-dark">Location:</strong> &nbsp;
+            {% if worker.location %}
+              {{ worker.location }}
+            {% else %}
+            {% endif %}
+          </li>
+
+          <li class="list-group-item border-0 ps-0 pb-0">
+            <strong class="text-dark text-sm">GitHub:</strong> &nbsp;
+            {% if worker.github_url %}
+              <a href="{{ worker.github_url }}" target="_blank" class="text-secondary me-xl-4 me-4">
+                <span class="text-lg fab fa-github"></span>
+              </a>
+            {% else %}
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
