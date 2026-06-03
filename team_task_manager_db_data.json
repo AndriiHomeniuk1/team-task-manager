@@ -69,7 +69,7 @@
       "last_name": "Miller",
       "email": "george.miller@example.com",
       "is_superuser": true,
-      "is_staff": false,
+      "is_staff": true,
       "is_active": true,
       "position": 2,
       "phone_number": "+380991234567",
