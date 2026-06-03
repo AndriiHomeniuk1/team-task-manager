@@ -1,5 +1,4 @@
 import os
-
 from .base import *
 
 
@@ -20,4 +19,17 @@ DATABASES = {
         "HOST": os.environ["POSTGRES_HOST"],
         "PORT": int(os.environ["POSTGRES_DB_PORT"]),
     }
+}
+
+# Cloudinary storage
+INSTALLED_APPS += ["cloudinary", "cloudinary_storage"]
+
+
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
 }
