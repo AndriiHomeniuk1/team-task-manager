@@ -1,5 +1,3 @@
-from PIL import Image
-
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import FileExtensionValidator
@@ -65,15 +63,6 @@ class Worker(AbstractUser):
 
     def __str__(self):
         return f"{self.username}: ({self.first_name} {self.last_name})"
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-        if self.avatar:
-            img = Image.open(self.avatar.path)
-            max_size = (800, 800)
-            img.thumbnail(max_size)
-            img.save(self.avatar.path)
 
 
 class Task(models.Model):
